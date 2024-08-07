@@ -1,3 +1,3 @@
-from django.db import models
-
-# Create your models here.
+from .Brand import Brand # noqa
+from .Product import Product # noqa
+from .Unit import Unit # noqa
