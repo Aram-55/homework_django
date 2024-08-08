@@ -1,9 +1,16 @@
 from django.db import models
 from django.contrib import admin
+from django.utils.html import format_html
+
 from .Unit import Unit
 from .Brand import Brand
 
-TYPE_CHOICES = ("Ապրանք", "Ծառայություն", "Պրոյեկտ", "Արտադրանք")
+TYPE_CHOICES = {
+    1: "Ապրանք",
+    2: "Ծառայություն",
+    3: "Պրոյեկտ",
+    4: "Արտադրանք"
+}
 
 
 class Product(models.Model):
@@ -13,7 +20,7 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     weight = models.FloatField(blank=True, null=True)
     buy_date = models.DateField(blank=True, null=True)
-    type = models.CharField(choices=TYPE_CHOICES)
+    type = models.PositiveIntegerField(choices=TYPE_CHOICES)
     comment = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -23,3 +30,19 @@ class Product(models.Model):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ("id", "unit_info", "brand_info", "code", "name", "weight", "buy_date", "type", "comment")
     search_fields = ("id", "name", "code")
+
+    def unit_info(self, obj):
+        link = "/admin/models/unit/{}/change/".format(obj.unit.id)
+        return format_html(
+            '<a href="{}">{}</a>'.format(link, obj.unit.id)
+        )
+
+    unit_info.short_description = "unit"
+
+    def brand_info(self, obj):
+        link = "/admin/models/brand/{}/change/".format(obj.brand.id)
+        return format_html(
+            '<a href="{}">{}</a>'.format(link, obj.brand.id)
+        )
+
+    brand_info.short_description = "brand"

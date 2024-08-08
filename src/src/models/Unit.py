@@ -7,7 +7,7 @@ class Unit(models.Model):
     measure = models.CharField(max_length=6)
 
     def __str__(self):
-        return self.code
+        return self.measure
 
 
 class UnitAdmin(admin.ModelAdmin):

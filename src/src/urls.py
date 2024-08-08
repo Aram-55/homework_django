@@ -16,7 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from .api.Brand import BrandView
+from .api.Unit import UnitView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/brand', BrandView.as_view()),
+    path('api/unit', UnitView.as_view())
 ]
