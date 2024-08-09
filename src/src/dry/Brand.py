@@ -1,6 +1,8 @@
 def dry_brand(brand):
-    data = {
-        "id": brand.id,
-        "name": brand.name
-    }
+    data = {}
+    if brand:
+        data = {
+            "id": brand.id,
+            "name": brand.name
+        }
     return data

@@ -32,17 +32,19 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ("id", "name", "code")
 
     def unit_info(self, obj):
-        link = "/admin/models/unit/{}/change/".format(obj.unit.id)
-        return format_html(
-            '<a href="{}">{}</a>'.format(link, obj.unit.id)
-        )
+        if obj.unit:
+            link = "/admin/models/unit/{}/change/".format(obj.unit.id)
+            return format_html(
+                '<a href="{}">{}</a>'.format(link, obj.unit.id)
+            )
 
     unit_info.short_description = "unit"
 
     def brand_info(self, obj):
-        link = "/admin/models/brand/{}/change/".format(obj.brand.id)
-        return format_html(
-            '<a href="{}">{}</a>'.format(link, obj.brand.id)
-        )
+        if obj.brand:
+            link = "/admin/models/brand/{}/change/".format(obj.brand.id)
+            return format_html(
+                '<a href="{}">{}</a>'.format(link, obj.brand.id)
+            )
 
     brand_info.short_description = "brand"

@@ -15,6 +15,10 @@ class BrandView(View):
 
     def post(self, request):
         data = json.loads(request.body)
+        try:
+            data.get(data["name"])
+        except KeyError:
+            return JsonResponse({"status": "Error", "error": "key must be name"}, status=400)
         if isinstance(data["name"], str):
             name = data["name"]
         else:
@@ -22,7 +26,7 @@ class BrandView(View):
         brand = Brand.objects.create(
             name=name
         )
-        return JsonResponse({"status": "ok", "id": brand.id}, status=200)
+        return JsonResponse({"data": dry_brand(brand)}, status=200)
 
     def patch(self, request):
         brand_id = request.GET.get("id")
@@ -34,7 +38,7 @@ class BrandView(View):
         if "name" in data:
             brand.name = data["name"]
         brand.save()
-        return JsonResponse({"status": "ok", "id": brand.id}, status=200)
+        return JsonResponse({"data": dry_brand(brand)}, status=200)
 
     def delete(self, request):
         brand_id = request.GET.get("id")

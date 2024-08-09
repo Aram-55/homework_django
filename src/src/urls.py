@@ -18,9 +18,11 @@ from django.contrib import admin
 from django.urls import path
 from .api.Brand import BrandView
 from .api.Unit import UnitView
+from .api.Product import ProductView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/brand', BrandView.as_view()),
-    path('api/unit', UnitView.as_view())
+    path('api/unit', UnitView.as_view()),
+    path('api/product', ProductView.as_view())
 ]
