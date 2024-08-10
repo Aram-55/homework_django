@@ -35,6 +35,10 @@ class BrandView(View):
             brand = Brand.objects.get(id=brand_id)
         except ObjectDoesNotExist:
             return JsonResponse({"status": "Error", "error": "brand object doesn't exist"}, status=400)
+        try:
+            data.get(data["name"])
+        except KeyError:
+            return JsonResponse({"status": "Error", "error": "key must be name"}, status=400)
         if "name" in data:
             brand.name = data["name"]
         brand.save()
