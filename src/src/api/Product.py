@@ -1,11 +1,11 @@
 import json
-from datetime import datetime
+import datetime
 
 from django.views import View
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 
-from ..models.Product import Product,TYPE_CHOICES
+from ..models.Product import Product, TYPE_CHOICES
 from ..models.Unit import Unit
 from ..models.Brand import Brand
 from ..dry.Product import dry_product
@@ -22,13 +22,13 @@ class ProductView(View):
         unit = data.get("unit_id")
         if unit:
             try:
-                unit = Unit.objects.get(id=data["unit_id"])
+                unit = Unit.objects.get(id=unit)
             except ObjectDoesNotExist:
                 return JsonResponse({"status": "error", "error": "object unit doesn't exist"}, status=400)
         brand = data.get("brand_id")
         if brand:
             try:
-                brand = Brand.objects.get(id=data["brand_id"])
+                brand = Brand.objects.get(id=brand)
             except ObjectDoesNotExist:
                 return JsonResponse({"status": "error", "error": "object brand doesn't exist"}, status=400)
         code = data.get("code")
@@ -49,7 +49,7 @@ class ProductView(View):
         if type and not TYPE_CHOICES.get(type):
             return JsonResponse({"status": "error", "error": "type must be one of TYPE_CHOICES"}, status=400)
         comment = data.get("comment")
-        if comment and not isinstance(comment,str):
+        if comment and not isinstance(comment, str):
             return JsonResponse({"status": "error", "error": "comment must be string"}, status=400)
         product = Product.objects.create(
             unit=unit,
@@ -62,3 +62,46 @@ class ProductView(View):
             comment=comment
         )
         return JsonResponse({"data": dry_product(product), "status": "ok"}, status=200)
+
+    def patch(self, request):
+        product_id = request.GET.get("id")
+        if isinstance(product_id, int):
+            product = Product.objects.get(pk=product_id)
+        else:
+            return JsonResponse({"status": "error", "error": "id must be integer"}, status=400)
+        data = json.loads(request.body)
+        if "unit_id" in data and isinstance(data["unit_id"], int):
+            try:
+                unit = Unit.objects.get(id=data["unit_id"])
+                product.unit = unit
+            except ObjectDoesNotExist:
+                return JsonResponse({"status": "error", "error": "object unit doesn't exist"}, status=400)
+        if "brand_id" in data and isinstance(data["brand_id"], int):
+            try:
+                brand = Brand.objects.get(id=data["brand_id"])
+                product.brand = brand
+            except ObjectDoesNotExist:
+                return JsonResponse({"status": "error", "error": "object brand doesn't exist"}, status=400)
+        if "code" in data and isinstance(data["code"], str):
+            product.code = data["code"]
+        if "name" in data and isinstance(data["name"], str):
+            product.name = data["name"]
+        if "weight" in data and isinstance(data["weight"], float):
+            product.weight = data["weight"]
+        if "buy_date" in data and isinstance(data["but_date"], datetime.date):
+            product.buy_date = data["buy_date"]
+        if "type" in data and data["type"] in TYPE_CHOICES and isinstance(data["type"], int):
+            product.type = data["type"]
+        if "comment" in data and isinstance("comment", str):
+            product.comment = data["comment"]
+        product.save()
+        return JsonResponse({"data": dry_product(product)}, status=200)
+
+    def delete(self, request):
+        product_id = request.GET.get("id")
+        try:
+            product = Product.objects.get(id=product_id)
+        except ObjectDoesNotExist:
+            return JsonResponse({"status": "error", "error": "object product doesn't exist"}, status=400)
+        product.delete()
+        return JsonResponse({"status": "ok"}, status=200)
